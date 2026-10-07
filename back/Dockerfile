@@ -4,7 +4,8 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
-COPY . .
+COPY tsconfig*.json nest-cli.json ./
+COPY /src ./src
 RUN npm run build
 RUN npm prune --omit=dev
 
@@ -14,5 +15,5 @@ ENV NODE_ENV=production
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/dist ./dist
-EXPOSE 13000
+EXPOSE 3000
 CMD ["node","dist/main.js"]
