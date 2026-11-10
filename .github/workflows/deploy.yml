@@ -16,7 +16,7 @@ jobs:
         service: [front back]
     steps:
       - name: Checkout
-        uses: action/checkout@v4
+        uses: actions/checkout@v4
 
       - name: Docker Login
         run: echo ${{secrets.DOCKER_PASS}} | docker login -u ${{secrets.DOCKER_USER}} --password-stdin
