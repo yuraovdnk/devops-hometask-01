@@ -1,0 +1,31 @@
+name: Deploy
+on: 
+  push:
+    branches: [main,hw/week4] #temp
+
+jobs:
+  checks:
+    name: Run checks
+    uses: ./.github/workflows/pr-check.yml
+
+  build:
+    needs: checks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [front back]
+    steps:
+      - name: Checkout
+        uses: action/checkout@v4
+
+      - name: Docker Login
+        run: echo ${{secrets.DOCKER_PASS}} | docker login -u ${{secrets.DOCKER_USER}} --password-stdin
+
+      - name: Build and Push docker image
+        env: 
+          IMAGE_SHA: ${{secrets.DOCKER_USER}}/todo-${{matrix.service}}:${{github.sha}}
+          IMAGE_LATEST: ${{secrets.DOCKER_USER}}/todo-${{matrix.service}}:latest
+        run: |
+          docker build -t ${{env.IMAGE_SHA}} -t ${{env.IMAGE_LATEST}} ${{matrix.service}}
+          docker push ${{env.IMAGE_SHA}}
+          docker push ${{env.IMAGE_LATEST}}

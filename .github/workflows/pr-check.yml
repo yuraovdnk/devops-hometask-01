@@ -1,0 +1,8 @@
+name: PR Check
+on:
+  pull_request:
+  branches: [week*]
+
+jobs:
+  check:
+    uses: ./.github/workflows/typecheck.yml
