@@ -7,8 +7,8 @@ jobs:
     name: typecheck (${{ matrix.service }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        fail-fast: false
         service: [back, front]
     steps:
       - name: Checkout code
