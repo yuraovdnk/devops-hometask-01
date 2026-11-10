@@ -1,7 +1,7 @@
 name: Deploy
 on: 
   push:
-    branches: [main,hw/week4] #temp
+   branches: [main, 'hw/**']
 
 jobs:
   checks:
