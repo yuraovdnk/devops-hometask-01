@@ -9,6 +9,7 @@ jobs:
     uses: ./.github/workflows/pr-check.yml
 
   build:
+    name: build (${{ matrix.service }})
     needs: checks
     runs-on: ubuntu-latest
     strategy:
