@@ -34,4 +34,20 @@ jobs:
           docker build ${{matrix.build_args}} -t ${{env.IMAGE_SHA}} -t ${{env.IMAGE_LATEST}} ${{matrix.service}}
           docker push ${{env.IMAGE_SHA}}
           docker push ${{env.IMAGE_LATEST}}
+          echo "image_sha=$IMAGE_SHA" >> $GITHUB_OUTPUT
+  
+  deploy:
+    name: deploy (${{ matrix.service }})
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: DOCKER_PASS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{secrets.SSH_HOST}}
+          username: ${{secrets.SSH_USER}}
+          key: ${{PRIVATE_KEY}}
+          script: |
+            cd /myapp
+            sed -i "s|^APP_VERSION=.*|APP_VERSION=sha-${{ github.sha }}|" .env.development.compose
   
