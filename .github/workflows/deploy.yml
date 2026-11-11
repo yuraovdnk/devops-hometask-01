@@ -13,7 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [front, back]
+        include:
+          - service: front
+            build-args: "--build-arg VITE_API_URL={{vars.VITE_API_URL}}"
+          - service: back
+            build_args: ""
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,6 +30,7 @@ jobs:
           IMAGE_SHA: ${{secrets.DOCKER_USER}}/todo-${{matrix.service}}:${{github.sha}}
           IMAGE_LATEST: ${{secrets.DOCKER_USER}}/todo-${{matrix.service}}:latest
         run: |
-          docker build -t ${{env.IMAGE_SHA}} -t ${{env.IMAGE_LATEST}} ${{matrix.service}}
+          docker build ${{matrix.build_args}} -t ${{env.IMAGE_SHA}} -t ${{env.IMAGE_LATEST}} ${{matrix.service}}
           docker push ${{env.IMAGE_SHA}}
           docker push ${{env.IMAGE_LATEST}}
+  
