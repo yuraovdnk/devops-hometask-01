@@ -48,6 +48,6 @@ jobs:
           username: ${{secrets.SSH_USER}}
           key: ${{secrets.PRIVATE_KEY}}
           script: |
-            cd /myapp
+            cd myapp/
             sed -i "s|^APP_VERSION=.*|APP_VERSION=sha-${{ github.sha }}|" .env.development.compose
   
