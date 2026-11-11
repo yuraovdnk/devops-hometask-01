@@ -58,7 +58,7 @@ jobs:
       - name: Smoke
         uses: action/checkout@v4
         env:
-          E2E_VITE_API_URL: ${{ vars.VITE_API_URL }}
+          E2E_BASE_URL: ${{ vars.VITE_API_URL }}
         run: |
           export E2E_BASE_URL="${E2E_BASE_URL%/api}"
           bash scripts/smoke.sh
