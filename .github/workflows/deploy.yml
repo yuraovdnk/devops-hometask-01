@@ -15,7 +15,7 @@ jobs:
       matrix:
         include:
           - service: front
-            build_args: "--build-arg VITE_API_URL={{vars.VITE_API_URL}}"
+            build_args: "--build-arg VITE_API_URL=${{vars.VITE_API_URL}}"
           - service: back
             build_args: ""
     steps:
