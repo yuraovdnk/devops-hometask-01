@@ -28,7 +28,7 @@ jobs:
 
       - name: Build and Push docker image
         env: 
-          IMAGE_SHA: ${{secrets.DOCKER_USER}}/todo-${{matrix.service}}:${{github.sha}}
+          IMAGE_SHA: ${{secrets.DOCKER_USER}}/todo-${{matrix.service}}:sha-${{ github.sha }}
           IMAGE_LATEST: ${{secrets.DOCKER_USER}}/todo-${{matrix.service}}:latest
         run: |
           docker build ${{matrix.build_args}} -t ${{env.IMAGE_SHA}} -t ${{env.IMAGE_LATEST}} ${{matrix.service}}
