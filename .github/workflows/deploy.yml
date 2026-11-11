@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: action/checkout@v4
+        uses: actions/checkout@v4
       - name: Smoke
         env:
           E2E_BASE_URL: ${{ vars.VITE_API_URL }}
