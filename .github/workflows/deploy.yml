@@ -68,10 +68,10 @@ jobs:
     if: always()
     uses: ./.github/workflows/notify.yml
     with:
-      checks: ${{needs.checks.result}}
-      build:  ${{needs.build.result}}
-      deploy: ${{needs.deploy.result}}
-      verify: ${{needs.verify.result}}
+      checks: ${{needs.checks}}
+      build:  ${{needs.build}}
+      deploy: ${{needs.deploy}}
+      verify: ${{needs.verify}}
     secrets:
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
