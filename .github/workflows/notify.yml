@@ -27,10 +27,10 @@ jobs:
     steps:
       - name: Notify Telegram
         run: |
-          CHECKS="${{ inputs.checks.result }}"
-          BUILD="${{ inputs.build.result }}"
-          DEPLOY="${{ inputs.deploy.result }}"
-          VERIFY="${{ inputs.verify.result }}"
+          CHECKS="${{ inputs.checks }}"
+          BUILD="${{ inputs.build }}"
+          DEPLOY="${{ inputs.deploy }}"
+          VERIFY="${{ inputs.verify }}"
           
           if [ "$CHECKS" != "success" ]; then
             TEXT="❌ Type-check упал%0A${{ github.repository }} @ ${{ github.ref_name }}%0A${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
