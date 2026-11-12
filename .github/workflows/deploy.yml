@@ -68,7 +68,7 @@ jobs:
     needs: [checks, build, deploy, verify]
     if: always()
     runs-on: ubuntu-latest
-    uses: ./github/workflows/notify.yml
+    uses: ./.github/workflows/notify.yml
     with:
       checks: ${{needs.checks.result}}
       build:  ${{needs.build.result}}
