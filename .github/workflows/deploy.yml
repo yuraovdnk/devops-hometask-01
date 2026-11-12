@@ -63,7 +63,6 @@ jobs:
         run: |
           export E2E_BASE_URL="${E2E_BASE_URL%/api}"
           bash scripts/smoke.sh
-
   notify: 
     needs: [checks, build, deploy, verify]
     if: always()

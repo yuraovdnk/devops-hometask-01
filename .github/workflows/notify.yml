@@ -43,12 +43,6 @@ jobs:
           else
             TEXT="✅ Деплой успешен%0A${{ github.repository }} @ ${{ github.ref_name }}%0AActor: ${{ github.actor }}%0AVersion: sha-${{ github.sha }}"
           fi
-      - name: Send в Telegram
-        env:
-          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          TEXT: ${{ steps.msg.outputs.text }}
-        run: |
-          curl -fsS -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
-            --data-urlencode "chat_id=${CHAT_ID}" \
-            --data-urlencode "text=${TEXT}"
+          curl -fsS -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            --data-urlencode "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+            --data-urlencode "text=${TEXT}
