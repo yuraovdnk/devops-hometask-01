@@ -63,3 +63,17 @@ jobs:
         run: |
           export E2E_BASE_URL="${E2E_BASE_URL%/api}"
           bash scripts/smoke.sh
+
+  notify: 
+    needs: [checks, build, deploy, verify]
+    if: always()
+    runs-on: ubuntu-latest
+    uses: ./github/workflows/notify.yml
+    with:
+      checks: ${{needs.checks.result}}
+      build:  ${{needs.build.result}}
+      deploy: ${{needs.deploy.result}}
+      verify: ${{needs.verify.result}}
+    secrets:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
