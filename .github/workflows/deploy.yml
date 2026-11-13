@@ -9,7 +9,7 @@ jobs:
     uses: ./.github/workflows/pr-check.yml
 
   build:
-    name: build (${{ matrix.service }})
+    name: Build (${{ matrix.service }})
     needs: checks
     runs-on: ubuntu-latest
     strategy:
@@ -20,13 +20,12 @@ jobs:
           - service: back
             build_args: ""
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Docker Login
         run: echo ${{secrets.DOCKER_PASS}} | docker login -u ${{secrets.DOCKER_USER}} --password-stdin
 
-      - name: Build and Push docker image
+      - name: Build and Push Docker image
         env: 
           IMAGE_SHA: ${{secrets.DOCKER_USER}}/todo-${{matrix.service}}:sha-${{ github.sha }}
           IMAGE_LATEST: ${{secrets.DOCKER_USER}}/todo-${{matrix.service}}:latest
@@ -37,12 +36,12 @@ jobs:
           echo "image_sha=$IMAGE_SHA" >> $GITHUB_OUTPUT
   
   deploy:
-    name: deploy (${{ matrix.service }})
+    name: Deploy
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: deploy to server via SSH
         uses: appleboy/ssh-action@v1.0.3
+
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
@@ -51,6 +50,7 @@ jobs:
             cd myapp/
             sed -i "s|^APP_VERSION=.*|APP_VERSION=sha-${{ github.sha }}|" .env.development.compose
             docker compose --env-file .env.development.compose up -d --no-deps back front
+
   verify:
     needs: deploy
     runs-on: ubuntu-latest
@@ -63,6 +63,7 @@ jobs:
         run: |
           export E2E_BASE_URL="${E2E_BASE_URL%/api}"
           bash scripts/smoke.sh
+          
   notify: 
     needs: [checks, build, deploy, verify]
     if: always()
