@@ -17,11 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        service: [front, back]
         include:
           - service: front
-            build_args: "--build-arg VITE_API_URL=${{vars.VITE_API_URL}}"
-          - service: back
-            build_args: ""
+            build_args: "--build-arg VITE_API_URL=${{ vars.VITE_API_URL }}"
     steps:
       - uses: actions/checkout@v4
 
