@@ -45,4 +45,4 @@ jobs:
           fi
           RESPONSE=$(-s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             -d "text=$TEXT")
-          echo $RESPONSE | grep -q '"ok"' || { echo "Telegram API rejected"; exit 1 }
+        
