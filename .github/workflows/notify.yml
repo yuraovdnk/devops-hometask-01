@@ -46,4 +46,4 @@ jobs:
           RESPONSE=$(curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
             -d "text=$TEXT")
-          echo $RESPONSE | grep -q '"ok"' || { echo "Telegram API rejected"; exit 1 }
+          echo $RESPONSE | grep -q '"ok"' || { echo "Telegram API rejected"; exit 1; }
