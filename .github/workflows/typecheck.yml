@@ -4,7 +4,7 @@ on:
 
 jobs:
   typecheck:
-    name: typecheck (${{ matrix.service }})
+    name: Typecheck (${{ matrix.service }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
