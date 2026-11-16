@@ -1,0 +1,80 @@
+name: Deploy
+on: 
+  push:
+   branches: ['week*', 'feature/**']
+
+env:
+  IMAGE_TAG: sha-${{ github.sha }}
+
+jobs:
+  checks:
+    name: Run checks
+    uses: ./.github/workflows/pr-check.yml
+
+  build:
+    name: Build (${{ matrix.service }})
+    needs: checks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [front, back]
+        include:
+          - service: front
+            build_args: "--build-arg VITE_API_URL=${{ vars.VITE_API_URL }}"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Docker Login
+        env: 
+          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+        run: echo "$DOCKER_PASS" | docker login -u ${{ vars.DOCKER_USER }} --password-stdin
+
+      - name: Build and Push Docker image
+        env: 
+          IMAGE: ${{ vars.DOCKER_USER }}/todo-${{ matrix.service }}
+        run: |
+          docker build ${{ matrix.build_args }} -t "$IMAGE:$IMAGE_TAG" -t "$IMAGE:latest" ${{ matrix.service }}
+          docker push "$IMAGE:$IMAGE_TAG"
+          docker push "$IMAGE:latest"
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: |
+            set -e
+            cd myapp/
+            sed -i "s|^APP_VERSION=.*|APP_VERSION=${{ env.IMAGE_TAG }}|" .env.development.compose
+            docker compose --env-file .env.development.compose up -d --no-deps back front
+
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Smoke
+        env:
+          E2E_BASE_URL: ${{ vars.VITE_API_URL }}
+        run: |
+          export E2E_BASE_URL="${E2E_BASE_URL%/api}"
+          bash scripts/smoke.sh
+
+  notify: 
+    needs: [checks, build, deploy, verify]
+    if: always()
+    uses: ./.github/workflows/notify.yml
+    with:
+      checks_result: ${{ needs.checks.result }}
+      build_result:  ${{ needs.build.result }}
+      deploy_result: ${{ needs.deploy.result }}
+      verify_result: ${{ needs.verify.result }}
+    secrets:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
