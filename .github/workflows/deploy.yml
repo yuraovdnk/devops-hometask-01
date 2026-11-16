@@ -1,7 +1,7 @@
 name: Deploy
 on: 
   push:
-    branches: [main, 'feature/**']
+   branches: ['week*', 'feature/**']
 
 env:
   IMAGE_TAG: sha-${{ github.sha }}
