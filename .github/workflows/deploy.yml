@@ -9,7 +9,7 @@ env:
 jobs:
   checks:
     name: Run checks
-    uses: ./.github/workflows/pr-check.yml
+    uses: ./.github/workflows/typecheck.yml
 
   build:
     name: Build (${{ matrix.service }})
@@ -22,7 +22,8 @@ jobs:
           - service: front
             build_args: "--build-arg VITE_API_URL=${{ vars.VITE_API_URL }}"
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Docker Login
         env: 
@@ -40,6 +41,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -51,14 +55,15 @@ jobs:
             set -e
             cd myapp/
             sed -i "s|^APP_VERSION=.*|APP_VERSION=${{ env.IMAGE_TAG }}|" .env.development.compose
+            docker compose --env-file .env.development.compose pull back front
             docker compose --env-file .env.development.compose up -d --no-deps back front
 
   verify:
     needs: deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Smoke
         env:
           E2E_BASE_URL: ${{ vars.VITE_API_URL }}
